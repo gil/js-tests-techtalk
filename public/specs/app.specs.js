@@ -33,7 +33,10 @@ describe('CounterView', function() {
   });
 
   it('should handle increase button click', function() {
-    this.sandbox.stub(CounterView.prototype, 'increase');
+    // Mudei aqui para mostrar que SPY também funcionaria, como foi perguntado.
+    // Uma outra diferença legal é que o SPY mantém o comportamento do método original,
+    // enquanto o STUB substitui o método por outro.
+    this.sandbox.spy(CounterView.prototype, 'increase');
     this.view = new CounterView();
     this.server.requests[0].respond(200, { 'Content-Type' : 'application/json' },
       JSON.stringify({ counter : 3 })
@@ -55,7 +58,7 @@ describe('CounterView', function() {
   });
 
   it('should handle decrease button click', function() {
-    this.sandbox.stub(CounterView.prototype, 'decrease');
+    this.sandbox.spy(CounterView.prototype, 'decrease');
     this.view = new CounterView();
     this.server.requests[0].respond(200, { 'Content-Type' : 'application/json' },
       JSON.stringify({ counter : 3 })
@@ -79,9 +82,11 @@ describe('CounterView', function() {
   it('should do something async', function(done) {
     this.view = new CounterView();
     this.view.doSomethingAsync(function(something) {
-      if( something ) {
-        done();
-      }
+      // Melhor fazer um expect().toBeTruthy() aqui do que o IF de antes.
+      // Assim a mensagem de erro fica mais amigável, caso "something" retorn false
+      // e evitamos ter que esperar o TIMEOUT nesses casos.
+      expect( something ).toBeTruthy();
+      done();
     });
     this.clock.tick(1000);
   });
